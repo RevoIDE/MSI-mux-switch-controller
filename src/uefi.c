@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void	uefi_read_var(unsigned char **dest)
 {

@@ -7,7 +7,12 @@
 # define EC_ARM 		0xD1
 # define BACKUP_DIR		"/root/msi-mux-backup"
 
+# define EC_PATH "/sys/kernel/debug/ec"
+# define WRITE_SUPPORT_PATH "/sys/module/ec_sys/parameters/write_support"
+
 extern const char *const MODES[4];
+
+typedef const char *CmdArgs[];
 
 //int	read_var(char **raw);
 
