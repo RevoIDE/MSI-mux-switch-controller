@@ -12,6 +12,9 @@ typedef struct s_status
 }	t_status;
 
 size_t		uefi_read_var(unsigned char **dest);
+int			uefi_write_var(unsigned char *raw, size_t len);
+int			uefi_backup_var(const unsigned char *raw, size_t len);
+int			uefi_restore_var(const char *path);
 t_status	uefi_decode		(uint8_t b);
 
 #endif

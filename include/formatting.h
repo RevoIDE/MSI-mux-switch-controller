@@ -28,7 +28,7 @@
 
 # define INFO(msg) \
     do { \
-        fprintf(stdout, CYN "Info: " RESET "%s\n", msg); \
+        fprintf(stdout, CYN "Info: " RST "%s\n", msg); \
     } while (0)
 
 #endif
