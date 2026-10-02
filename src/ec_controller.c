@@ -5,8 +5,15 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
+
+#include <sys/types.h>
+
 
 bool check_write__(const char *path)
 {
@@ -38,11 +45,40 @@ void ec_ready(bool write)
 		ERROR("EC_SYS / DEBUGFS Unavailable");
 }
 
-char	ec_read(size_t offset)
+int		ec_read(off_t	off)
 {
-	char	*buf;
-	io_file_read(EC_IO, &buf, "rb", &(size_t) {1}, offset);
-	char	c = *buf;
-	free(buf);
-	return c;
+	uint8_t	val;
+	int		fd;
+	ssize_t	bytes_read;
+
+	fd = open(EC_IO, O_RDONLY);
+	if (fd < 0)
+		return (-1);
+
+	bytes_read = pread(fd, &val, 1, off);
+	close(fd);
+
+	return (bytes_read == 1) ? val : -1;
+}
+
+int		ec_write(off_t off, uint8_t val)
+{
+	int	fd = open(EC_IO, O_WRONLY);
+	if (fd == -1)
+		ERROR("Failed to open EC var file for writing");
+
+	if (fd < 0)
+		return (-1);
+
+	if (pwrite(fd, &val, 1, off) != 1)
+	{
+		close(fd);
+		ERROR("Failed to write to EC var file");
+	}
+
+	if (ec_read(off) != val)
+		WARN("checked EC[0x%02X] != 0x%02X. The firmware may have changed it");
+
+	close(fd);
+	return (0);
 }
