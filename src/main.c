@@ -50,7 +50,7 @@ void	display_status(void)
 int	main(int argc, char *argv[])
 {
 	if (geteuid())
-		WARN("UEFI status can be obtained in user mode, mode switch requires root");
+		ERROR("Should be run as root");
 
 	switch (argc)
 	{
