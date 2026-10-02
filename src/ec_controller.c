@@ -14,7 +14,6 @@
 
 #include <sys/types.h>
 
-
 bool check_write__(const char *path)
 {
 	char	*buf;
@@ -36,11 +35,11 @@ void ec_ready(bool write)
 	if (write && !wr)
 	{
 		if (loaded)
-			run_command((CmdArgs){"modprob", "-r", "ec_sys"}, false);
-		run_command((CmdArgs){"modprobe", "ec_sys", "write_support=1"}, true);
+			run_command((CmdArgs){"modprobe", "-r", "ec_sys", NULL}, false);
+		run_command((CmdArgs){"modprobe", "ec_sys", "write_support=1", NULL}, true);
 	}
 	else if (!loaded)
-		run_command((CmdArgs){"modprobe", "ec_sys"}, false);
+		run_command((CmdArgs){"modprobe", "ec_sys", NULL}, false);
 	if (!os_path_available(EC_IO))
 		ERROR("EC_SYS / DEBUGFS Unavailable");
 }
