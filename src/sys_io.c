@@ -71,6 +71,7 @@ int	run_command(const char *const argv[], int check)
 int	io_file_read(const char *path, char **buf, const char *mode, size_t *max_len, size_t offset)
 {
 	FILE	*fp;
+	long	pos;
 	size_t	len;
 
 	*buf = NULL;
@@ -79,24 +80,34 @@ int	io_file_read(const char *path, char **buf, const char *mode, size_t *max_len
 	if (!fp)
 		return (-1);
 
-	if (fseek(fp, offset, SEEK_SET) != 0)
+	if (fseek(fp, 0, SEEK_END) != 0)
 	{
 		fclose(fp);
 		return (-1);
 	}
 
-	len = ftell(fp);
+	pos = ftell(fp);
+
+	if (pos < 0)
+	{
+		fclose(fp);
+		return (-1);
+	}
+
+	len = (size_t) pos;
+
+	if (offset > len)
+	{
+		fclose(fp);
+		return (-1);
+	}
+
+	len -= offset;
 
 	if (max_len && len > *max_len)
 		len = *max_len;
 
-	if (len < 0)
-	{
-		fclose(fp);
-		return (-1);
-	}
-
-	if (fseek(fp, 0, SEEK_SET) != 0)
+	if (fseek(fp, offset, SEEK_SET) != 0)
 	{
 		fclose(fp);
 		return (-1);
