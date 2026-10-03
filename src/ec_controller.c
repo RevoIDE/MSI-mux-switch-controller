@@ -60,24 +60,24 @@ int		ec_read(off_t	off)
 	return (bytes_read == 1) ? val : -1;
 }
 
-int		ec_write(off_t off, uint8_t val)
+void	ec_write(off_t off, uint8_t val)
 {
-	int	fd = open(EC_IO, O_WRONLY);
-	if (fd == -1)
-		ERROR("Failed to open EC var file for writing");
+	int		fd;
+	ssize_t	n;
+	char	msg[96];
 
+	fd = open(EC_IO, O_WRONLY);
 	if (fd < 0)
-		return (-1);
-
-	if (pwrite(fd, &val, 1, off) != 1)
-	{
-		close(fd);
-		ERROR("Failed to write to EC var file");
-	}
-
-	if (ec_read(off) != val)
-		WARN("checked EC[0x%02X] != 0x%02X. The firmware may have changed it");
-
+		ERROR("Failed to open EC io for writing");
+	n = pwrite(fd, &val, 1, off);
 	close(fd);
-	return (0);
+	if (n != 1)
+		ERROR("Failed to write to EC io");
+	if (ec_read(off) != val)
+	{
+		snprintf(msg, sizeof(msg),
+			"EC[0x%02X] read back != 0x%02X (firmware may have changed it)",
+			(unsigned)off, val);
+		WARN(msg);
+	}
 }

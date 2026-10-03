@@ -25,4 +25,5 @@ target_compile_options(
 	-Wall
 	-Werror
 	-Wextra
+	-Wconversion
 )
