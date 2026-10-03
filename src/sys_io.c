@@ -107,7 +107,7 @@ int	io_file_read(const char *path, char **buf, const char *mode, size_t *max_len
 	if (max_len && len > *max_len)
 		len = *max_len;
 
-	if (fseek(fp, offset, SEEK_SET) != 0)
+	if (fseek(fp, (long) offset, SEEK_SET) != 0)
 	{
 		fclose(fp);
 		return (-1);

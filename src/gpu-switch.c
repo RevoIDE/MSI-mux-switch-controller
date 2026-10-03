@@ -39,12 +39,14 @@ void	gpu_set_mode(int mode, bool dry_run)
 		return;
 	}
 
-	uint8_t		new_byte = (byte & ~0b11) | mode;
+	uint8_t		new_byte = (uint8_t)((byte & ~0b11) | mode);
 	ec_ready(!dry_run);
 	int			ec_byte = ec_read(EC_ARM);
+
 	if (ec_byte < 0)
 		ERROR("Unable to read EC arm register");
-	uint8_t		new_ec_byte = (ec_byte & ~0b11) | 0b01;
+
+	uint8_t		new_ec_byte = (uint8_t)((ec_byte & ~0b11) | 0b01);
 
 	printf("UEFI byte 5 : 0x%02X -> 0x%02X\n", byte, new_byte);
 	printf("EC[0x%02X]    : 0x%02X -> 0x%02X\n", EC_ARM, ec_byte, new_ec_byte);
@@ -78,16 +80,17 @@ void	gpu_cancel(void)
 	len = uefi_read_var(&dest);
 	status = uefi_decode(dest[OFF]);
 
+	ec_ready(true);
+	ec_byte = ec_read(EC_ARM);
+
 	uefi_backup_var(dest, len);
-	dest[OFF] = (dest[OFF] & ~0b11) | status.current;
+	dest[OFF] = (uint8_t)((dest[OFF] & ~0b11) | status.current);
 	uefi_write_var(dest, len);
 	free(dest);
 
-	ec_ready(true);
-	ec_byte = ec_read(EC_ARM);
 	if (ec_byte < 0)
 		ERROR("Unable to read EC arm register");
-	ec_write(EC_ARM, ec_byte & ~0b11);
+	ec_write(EC_ARM, (uint8_t)(ec_byte & ~0b11));
 
 	snprintf(msg, sizeof(msg), "Switch cancelled, staying in %s mode", MODES[status.current]);
 	INFO(msg);
